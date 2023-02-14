@@ -19,8 +19,8 @@ class AuthController extends Controller
 
     public function registerUser(Request $request){
         $request->validate([
-            'firstName'=>'required',
-            'lastName'=>'required',
+            'firstName'=>'required|string',
+            'lastName'=>'required|string',
             'email'=>'required|email|unique:users',
             'password'=>'required|string|min:8'
         ]);
@@ -58,7 +58,11 @@ class AuthController extends Controller
         if($user){
             if(Hash::check($request->password, $user->password)){
                 $request->session()->put('loginUser', $user->id);
-                return redirect('dashboard');
+                $request->session()->put('role', $user->role);
+                if($user->role == 'user'){
+                    return redirect('/');
+                }
+                return redirect('plates');
             }else{
                 return back()->with('fail', 'Password are not correct');
             }
@@ -67,23 +71,15 @@ class AuthController extends Controller
         }
     }
 
-    // Admin dashboard
-
-    public function dashboard(){
-        $users = array();
-
-        if(Session::has('loginUser')){
-            $users = User::where('role','user')->get();
-        }
-        
-        return view('dashboard', compact('users'));
-    }
-
     // logout
     public function logout(){
         if(Session::has('loginUser')){
             Session::pull('loginUser');
+            if(Session::get('role') == 'user'){
+                return redirect('/');
+            }
             return redirect('login');
+            
         }
     }
 

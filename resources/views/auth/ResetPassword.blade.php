@@ -17,7 +17,7 @@
     
         <form action="{{ route('reset.password.post') }}" method="POST">
             @csrf
-            
+
             @if(Session::has('success'))
                 <div class="alert alert-success">{{Session::get('success')}}</div>
             @endif
@@ -28,11 +28,19 @@
 
             <input type="hidden" name="token" value="{{ $token }}">
 
-            <input type="text" name="email">
-        
             <div>
+                <label for="email">Email</label>
+                <input type="email" name="email" class="form-control" value="{{old('email')}}" autofocus required>
+                <span class="text-danger">
+                    @error('email')
+                        {{ $message }}
+                    @enderror
+                </span>
+            </div>
+        
+            <div class="mt-3">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" name="password" value="{{old('password')}}" autofocus>
+                <input type="password" class="form-control" name="password" value="{{old('password')}}">
                 <span class="text-danger">
                     @error('password')
                         {{ $message }}
